@@ -47,12 +47,14 @@ class client:
             self.__server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.__server_sock.settimeout(3.0)
             self.__server_sock.connect((self.__host, self.__port))
+
         except:
             if self.__retry != 5:
                 self.__retry += 1
                 time.sleep(5)
                 self.__connect()
             else:
+                print self.__host, self.__port
                 sys.stderr.write("PED-RPC> unable to connect to server %s:%d\n" % (self.__host, self.__port))
                 raise Exception            
         # disable timeouts and lingering.

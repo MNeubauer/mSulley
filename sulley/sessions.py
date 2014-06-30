@@ -113,6 +113,7 @@ class connection (pgraph.edge.edge):
 class session (pgraph.graph):
     def __init__(
                   self,
+                  test_case_dir=os.getcwd(),
                   session_filename=None,
                   skip=0,
                   sleep_time=1.0,
@@ -127,8 +128,12 @@ class session (pgraph.graph):
                   crash_threshold=3,
                   restart_sleep_time=300
                 ):
+
         '''
         Extends pgraph.graph and provides a container for architecting protocol dialogs.
+
+        @type  test_case_dir:     String
+        @kwarg test_case_dir:     (Optional, def=os.getcwd()) Path to directory where data sent to server is stored
 
         @type  session_filename:   String
         @kwarg session_filename:   (Optional, def=None) Filename to serialize persistant data to
@@ -158,9 +163,16 @@ class session (pgraph.graph):
         @kwarg web_port:           (Optional, def=26000) Port for monitoring fuzzing campaign via a web browser	
 	'''
 
+        # Ensure the log path is a directory.
+        if not os.path.isdir(test_case_dir):
+            sys.stderr.write('\"' + test_case_dir + "\" is not a directory, aborting\n")
+            sys.exit()
+
+
         # run the parent classes initialization routine first.
         pgraph.graph.__init__(self)
 
+        self.test_case_dir       = test_case_dir
         self.session_filename    = session_filename
         self.skip                = skip
         self.sleep_time          = sleep_time
@@ -172,6 +184,8 @@ class session (pgraph.graph):
         self.web_port            = web_port
         self.crash_threshold     = crash_threshold
         self.restart_sleep_time  = restart_sleep_time
+        self.test_number         = 1
+        self.test_case_file      = None
 
         # Initialize logger
         self.logger = logging.getLogger("Sulley_logger")
@@ -443,6 +457,10 @@ class session (pgraph.graph):
 
                     # attempt to complete a fuzz transmission. keep trying until we are successful, whenever a failure
                     # occurs, restart the target.
+                    test_file_path = os.path.join(self.test_case_dir, 
+                                                  str(self.test_number) + ".txt")
+                    self.test_case_file = open(test_file_path, 'w')
+                    self.test_number += 1
                     while 1:
                         # instruct the debugger/sniffer that we are about to send a new fuzz.
                         if target.procmon:
@@ -478,6 +496,7 @@ class session (pgraph.graph):
                             # Connect is needed only for TCP stream
                             if self.proto == socket.SOCK_STREAM:
                                 sock.connect((target.host, target.port))
+                                print target, target.host, target.port
                         except Exception, e:
                             error_handler(e, "failed connecting on socket", target, sock)
                             continue
@@ -503,6 +522,7 @@ class session (pgraph.graph):
                             for e in path[:-1]:
                                 node = self.nodes[e.dst]
                                 self.transmit(sock, node, e, target)
+                                print "sock", sock,"node",  node,"e", e, "target"
                         except Exception, e:
                             error_handler(e, "failed transmitting a node up the path", target, sock)
                             continue
@@ -510,13 +530,14 @@ class session (pgraph.graph):
                         # now send the current node we are fuzzing.
                         try:
                             self.transmit(sock, self.fuzz_node, edge, target)
+                            print "sock", sock, "self.fuzz_node", self.fuzz_node, "edge", edge, "target"
                         except Exception, e:
                             error_handler(e, "failed transmitting fuzz node", target, sock)
                             continue
 
                         # if we reach this point the send was successful for break out of the while(1).
                         break
-
+                    self.test_case_file.close()
                     # if the user registered a post-send function, pass it the sock and let it do the deed.
                     # we do this outside the try/except loop because if our fuzz causes a crash then the post_send()
                     # will likely fail and we don't want to sit in an endless loop.
@@ -867,6 +888,8 @@ class session (pgraph.graph):
         try:
             if self.proto == socket.SOCK_STREAM:
                 sock.send(data)
+                self.test_case_file.write(data)
+                self.test_case_file.write("split_here")
             else:
                 sock.sendto(data, (self.targets[0].host, self.targets[0].port))
             self.logger.debug("Packet sent : " + repr(data))
