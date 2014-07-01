@@ -1,5 +1,5 @@
-from sulley import blocks, primitives, legos
-
+#from sulley import primitives, blocks, legos
+from sulley import *
 ###############################################################################
 """
     struct MsgHeader {
@@ -23,7 +23,7 @@ from sulley import blocks, primitives, legos
     OP_KILL_CURSORS  2007   Tell database client is done with a cursor
 """
 
-class MsgHeader(blocks.blocks):
+class MsgHeader(blocks.block):
     def __init__(self, name, request, value, options={"requestID": None, 
                                                       "responseTo": None,
                                                       "opCode": None}):
@@ -50,7 +50,7 @@ class MsgHeader(blocks.blocks):
     }
 """
 
-class OP_KILL_CURSORS(blocks.blocks):
+class OP_KILL_CURSORS(blocks.block):
     def __init__(self, name, request, value, options={
                                                     "numberOfCursorIDs": None,
                                                     "cursorIDs": None

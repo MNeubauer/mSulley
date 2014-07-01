@@ -2,12 +2,12 @@ import ber
 import dcerpc
 import misc
 import xdr
-
+import mongo
 # all defined legos must be added to this bin.
 BIN = {}
 
-BIN["MsgHeader"]            = mongoLego.MsgHeader
-BIN["OP_KILL_CURSORS"]      = mongoLego.OP_KILL_CURSORS
+BIN["MsgHeader"]            = mongo.MsgHeader
+BIN["OP_KILL_CURSORS"]      = mongo.OP_KILL_CURSORS
 
 BIN["ber_string"]           = ber.string
 BIN["ber_integer"]          = ber.integer
