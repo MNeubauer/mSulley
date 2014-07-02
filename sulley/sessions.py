@@ -522,7 +522,6 @@ class session (pgraph.graph):
                             for e in path[:-1]:
                                 node = self.nodes[e.dst]
                                 self.transmit(sock, node, e, target)
-                                print "sock", sock,"node",  node,"e", e, "target"
                         except Exception, e:
                             error_handler(e, "failed transmitting a node up the path", target, sock)
                             continue
@@ -530,7 +529,6 @@ class session (pgraph.graph):
                         # now send the current node we are fuzzing.
                         try:
                             self.transmit(sock, self.fuzz_node, edge, target)
-                            print "sock", sock, "self.fuzz_node", self.fuzz_node, "edge", edge, "target"
                         except Exception, e:
                             error_handler(e, "failed transmitting fuzz node", target, sock)
                             continue

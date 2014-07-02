@@ -61,11 +61,7 @@ class OP_KILL_CURSORS(blocks.block):
         self.cursorIDs = options["cursorIDs"]
         # Form an internal block.
         message = blocks.block(name + "kill_cursors", request)
-        message.push(s_lego("MsgHeader", None, options=
-                                                    {"requestID": 2342, 
-                                                     "responseTo": 2453,
-                                                     "opCode": self.opcode}))
-        # For now, this is always zero, do we want to fuzz this?
+        # For now, docs say that this is always zero, do we want to fuzz this?
         message.push(primitives.dword(0, signed=True))
         message.push(primitives.dword(self.numberOfCursorIDs, signed=True))
         message.push(primitives.qword(self.cursorIDs, signed=True))
