@@ -8,6 +8,7 @@ BIN = {}
 
 BIN["MsgHeader"]            = mongo.MsgHeader
 BIN["OP_KILL_CURSORS"]      = mongo.OP_KILL_CURSORS
+BIN["OP_INSERT"]            = mongo.OP_INSERT
 
 BIN["ber_string"]           = ber.string
 BIN["ber_integer"]          = ber.integer
