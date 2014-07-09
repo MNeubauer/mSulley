@@ -6,7 +6,6 @@ import mongo
 # all defined legos must be added to this bin.
 BIN = {}
 
-BIN["MsgHeader"]            = mongo.MsgHeader
 BIN["OP_KILL_CURSORS"]      = mongo.OP_KILL_CURSORS
 BIN["OP_INSERT"]            = mongo.OP_INSERT
 
