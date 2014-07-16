@@ -219,29 +219,15 @@ class NetworkMonitorPedrpcServer (pedrpc.server):
 
 ########################################################################################################################
 
-#usage_message = create_usage()
-rpc_port = 26001
-IFS = []
-opts = None
-
-device      = None    
-pcap_filter = ""
-log_path    = "./"
-log_level   = 1
-
 
 if __name__ == "__main__":
-   # usage_message = create_usage()
-    """
     rpc_port = 26001
-   # IFS = []
+    IFS = []
     opts = None
-
-    device      = None
+    device      = None    
     pcap_filter = ""
     log_path    = "./"
     log_level   = 1
-    """
     usage_message = create_usage()
     
     # parse command line options.
@@ -249,13 +235,6 @@ if __name__ == "__main__":
         opts, args = getopt.getopt(sys.argv[1:], "d:f:P:l:", ["device=", "filter=", "log_path=", "log_level=", "port="])
     except getopt.GetoptError as err:
         log_error(usage_message)
-    """
-    device      = None
-    pcap_filter = ""
-    log_path    = "./"
-    log_level   = 1
-    """
-
 
     for opt, arg in opts:
         if opt in ("-d", "--device"):

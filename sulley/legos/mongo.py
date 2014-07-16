@@ -114,7 +114,7 @@ class OP_INSERT(Mongo_op.Mongo_op):
 """
 # Need to come up with a way to have cursors and know their cursor_id
 
-class OP_KILL_CURSORS(blocks.block):
+class OP_KILL_CURSORS(Mongo_op.Mongo_op):
     """This sulley lego represents an OP_KILL_CURSORS MongoDB message."""
     def __init__(self, name, request, value, options):
         # Create the super class and push a header to the block.
