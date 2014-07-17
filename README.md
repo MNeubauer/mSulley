@@ -45,9 +45,9 @@ To be continued
             - E.G. Making the bson interpretation more complex
 
 ## Usage
-##### Requests
-* The Sulley call to use a lego is `def s_lego (lego_type, value=None, options={})`
-* All `lego_type`'s can be found in [sulley/legos/__init__.py](sulley/legos/__init__.py)
+#### Requests
+* The Sulley definition of a call for a lego is `def s_lego(lego_type, value=None, options={})`
+* All `lego_type`'s can be found in [sulley/legos/\__init\__.py](sulley/legos/__init__.py)
 * Calls to s_lego for MongoDB messages use the options dict as a way of passing initial values for the message.
 * See the [MongoDB wire protocol spec](http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/) for details on what is expected for each message.
 * Notes on the **MsgHeader**:
@@ -62,26 +62,26 @@ To be continued
 * Each request starts with `s_initialize("example request")`.
     - A session uses this request as a node with a call to `sess.connect("example request")`.
 * An example request containing one insert message:
-    ```python
-    s_initialize("insert")
-    s_lego("OP_INSERT", options=
-        {
-            # MsgHeader
-            "requestID": 98134,
-            # OP_INSERT
-            "flags": 1,
-            "db": "test",
-            "collection": "fuzzing",
-            "documents": [
-                {
-                    "_id": 0,
-                    "number": 100,
-                    "str": "hello there",
-                    "obj":{"nested": "stuff"}
-                }
-            ]
-        })
-    ```
+```python
+s_initialize("insert")
+s_lego("OP_INSERT", options=
+    {
+        # MsgHeader
+        "requestID": 98134,
+        # OP_INSERT
+        "flags": 1,
+        "db": "test",
+        "collection": "fuzzing",
+        "documents": [
+            {
+                "_id": 0,
+                "number": 100,
+                "str": "hello there",
+                "obj":{"nested": "stuff"}
+            }
+        ]
+    })
+```
 * An example request containing one kill cursor message:
     - This request contains a nested block, so that if this request is extended, future sulley primitives can reference the block by name.
     ```python
@@ -102,24 +102,52 @@ To be continued
     s_block_end("kill_cursor_msg")
     ```
 * An example of an update message
-    ```python
-    s_initialize("update")
-    s_lego("OP_UPDATE", options=
-        {
-            "requestID": 56163,
-            "db": "test",
-            "collection": "fuzzing",
-            "flags": 1,
-            "selector": {
-                "_id": 0,
-            },
-            "update":{
-                "number": 11,
-                "str": "Hello again",
-                "obj":{"birds": "nest"}
-            }
-        })
-    ```
+```python
+s_initialize("update")
+s_lego("OP_UPDATE", options=
+    {
+        "requestID": 56163,
+        "db": "test",
+        "collection": "fuzzing",
+        "flags": 1,
+        "selector": {
+            "_id": 0,
+        },
+        "update": {
+            "number": 11,
+            "str": "Hello again",
+            "obj":{"birds": "nest"}
+        }
+    })
+```
 
 ## Developer info
-To be continued
+### Important components
+* Creating a simple MongoDB message lego using [Mongo_op](./sulley/legos/Mongo_op.py):
+```python
+class OP_NEW(Mongo_op.Mongo_op):
+    """This sulley lego represents an OP_NEW MongoDB message"""
+    def __init__(self, name, request, value, options):
+        # Create the super class and push a header to the block.
+        options = self.init_options(options, NEW_OPCODE)
+        Mongo_op.Mongo_op.__init__(self, name, request, options)
+        
+        # Save the appropriate options in case we need to 
+        # reference them again in the future and set defaults
+        self.db = options.get("db", "test")
+        self.collection = options.get("collection", "fuzzing")
+        self.flags = options.get("flags", NEW_FLAGS)
+        self.document = options.get("document", {})
+       
+        # This command has 32 bits of reserved space.
+        self.push(primitives.dword(0, signed=True))
+        # cstring fullCollectionname
+        self.push_namespace(self.db, self.collection)
+        # int32 flags
+        self.push(primitives.dword(self.flags, signed=True))
+        # bson document
+        self.push_bson_doc(self.document)
+
+        # Always end with this command!
+        self.end_block()
+```
