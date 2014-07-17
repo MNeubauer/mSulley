@@ -45,7 +45,7 @@ To be continued
             - E.G. Making the bson interpretation more complex
 
 ## Usage
-#### Requests
+### Requests
 * The Sulley definition of a call for a lego is `def s_lego(lego_type, value=None, options={})`
 * All `lego_type`'s can be found in [sulley/legos/\__init\__.py](sulley/legos/__init__.py)
 * Calls to s_lego for MongoDB messages use the options dict as a way of passing initial values for the message.
@@ -61,6 +61,7 @@ To be continued
 * Multiple requests can be made per file in a the [requests](./requests) directory.
 * Each request starts with `s_initialize("example request")`.
     - A session uses this request as a node with a call to `sess.connect("example request")`.
+
 * An example request containing one insert message:
 ```python
 s_initialize("insert")
@@ -84,23 +85,23 @@ s_lego("OP_INSERT", options=
 ```
 * An example request containing one kill cursor message:
     - This request contains a nested block, so that if this request is extended, future sulley primitives can reference the block by name.
-    ```python
-    s_initialize("kill cursor")
-    if s_block_start("kill_cursor_msg"):
-        s_lego("OP_KILL_CURSORS", options=
-        {
-            "requestID": 124098,
-            "numberOfCursorIDs": 5,
-            "cursorIDs": [
-                2346245,
-                123465663,
-                76254,
-                85662214,
-                6245246
-            ]
-        })
-    s_block_end("kill_cursor_msg")
-    ```
+```python
+s_initialize("kill cursor")
+if s_block_start("kill_cursor_msg"):
+    s_lego("OP_KILL_CURSORS", options=
+    {
+        "requestID": 124098,
+        "numberOfCursorIDs": 5,
+        "cursorIDs": [
+            2346245,
+            123465663,
+            76254,
+            85662214,
+            6245246
+        ]
+    })
+s_block_end("kill_cursor_msg")
+```
 * An example of an update message
 ```python
 s_initialize("update")
@@ -122,7 +123,7 @@ s_lego("OP_UPDATE", options=
 ```
 
 ## Developer info
-### Important components
+### New Wire Messages
 * Creating a simple MongoDB message lego using [Mongo_op](./sulley/legos/Mongo_op.py):
 ```python
 class OP_NEW(Mongo_op.Mongo_op):
@@ -151,3 +152,15 @@ class OP_NEW(Mongo_op.Mongo_op):
         # Always end with this command!
         self.end_block()
 ```
+In order to reference the new lego in a request, you must also add the following line to [sully/legos/\__init\__.py](sully/legos/\__init\__.py)
+```python
+BIN["OP_NEW"] = mongo.OP_NEW
+```
+
+### Future development
+* Switch command line parsing from getopt to the more pythonic [argparse](https://docs.python.org/dev/library/argparse.html)
+* Sulley's **unix process monitor**
+    - The process monitor's main function is to restart a mongod server after a crash occurs and store information about a crash.
+    - This is currently under development and is not stable.
+* **BSON document support**
+    - The current handling of bson documents is very simple and does not allow for much type specification.
