@@ -34,9 +34,8 @@ class OP_UPDATE(Mongo_op.Mongo_op):
     """This sulley lego represents an OP_UPDATE MongoDB message"""
     def __init__(self, name, request, value, options):
         # Create the super class and push a header to the block.
-        self.header_opts = options.get("header_opts", {})
-        self.header_opts["opCode"] = 2001
-        Mongo_op.Mongo_op.__init__(self, name, request, self.header_opts)
+        options = self.init_options(options, 2001)
+        Mongo_op.Mongo_op.__init__(self, name, request, options)
         
         self.db = options.get("db", "test")
         self.collection = options.get("collection", "fuzzing")
@@ -83,9 +82,8 @@ class OP_INSERT(Mongo_op.Mongo_op):
     """This sulley lego represents an OP_INSERT MongoDB message."""
     def __init__(self, name, request, value,  options):
         # Create the super class and push a header to the block.
-        self.header_opts = options.get("header_opts", {})
-        self.header_opts["opCode"] = 2002
-        Mongo_op.Mongo_op.__init__(self, name, request, self.header_opts)
+        options = self.init_options(options, 2002)
+        Mongo_op.Mongo_op.__init__(self, name, request, options)
 
         self.flags = options.get("flags", 1)
         self.db = options.get("db", "test")
@@ -118,9 +116,8 @@ class OP_KILL_CURSORS(Mongo_op.Mongo_op):
     """This sulley lego represents an OP_KILL_CURSORS MongoDB message."""
     def __init__(self, name, request, value, options):
         # Create the super class and push a header to the block.
-        header_opts = options.get("header_opts", {})
-        header_opts["opCode"] = 2007
-        Mongo_op.Mongo_op.__init__(self, name, request, header_opts)
+        options = self.init_options(options, 2007)
+        Mongo_op.Mongo_op.__init__(self, name, request, options)
 
         self.numberOfCursorIDs = options.get('numberOfCursorIDs', 10)
         self.cursorIDs = options.get('cursorIDs', None)

@@ -10,16 +10,21 @@ seed(475)
 
 class Mongo_op(blocks.block):
     """An abstract class representing all legos for MongoDB operations"""
-    def __init__(self, name, request, header_opts):
+    def __init__(self, name, request, options):
         blocks.block.__init__(self, name, request, None, None, None, None)
-        self.header_opts = header_opts
         self.block_name = name + "_"
         self.block = blocks.block(self.block_name, request)
-        self.requestID = header_opts.get("requestID", randint(1, (2**31)-1))
-        self.responseTo = header_opts.get("responseTo", 
+        self.requestID = options.get("requestID", randint(1, (2**31)-1))
+        self.responseTo = options.get("responseTo", 
                                           [pack('<i',0), pack('<i',-1)])
-        self.opCode = header_opts["opCode"]
+        self.opCode = options["opCode"]
         self.push_header()
+
+    def init_options(self, options, opCode):
+        if not options:
+            options = {}
+        options["opCode"] = opCode
+        return options
 
     def push_header(self):
         """
