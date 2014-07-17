@@ -45,15 +45,81 @@ To be continued
             - E.G. Making the bson interpretation more complex
 
 ## Usage
-To be continued
+##### Requests
+* The Sulley call to use a lego is `def s_lego (lego_type, value=None, options={})`
+* All `lego_type`'s can be found in [sulley/legos/__init__.py](sulley/legos/__init__.py)
+* Calls to s_lego for MongoDB messages use the options dict as a way of passing initial values for the message.
+* See the [MongoDB wire protocol spec](http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/) for details on what is expected for each message.
+* Notes on the **MsgHeader**:
+    - The messageLength field is calculated by a sizer upon initialization of each lego
+    - The opCode field is implied by the type of lego that is called
+    - It is suggested that the user leave out the responseTo field
+        - SSL handshake is expected if this field is not 0 or -1
+        - The fuzzer will test across both of these values if the field is not specified
+* The `fullCollectionName` field is not expected. Instead pass separate `db` and `collection` fields wherever the spec calls for `fullCollectionName`. This is so Sulley can fuzz the delimiter properly.
+* Legos currently do not expect options for fields that are reserved and filled with zeros.
+* Multiple requests can be made per file in a the [requests](./requests) directory.
+* Each request starts with `s_initialize("example request")`.
+    - A session uses this request as a node with a call to `sess.connect("example request")`.
+* An example request containing one insert message:
+    ```python
+    s_initialize("insert")
+    s_lego("OP_INSERT", options=
+        {
+            # MsgHeader
+            "requestID": 98134,
+            # OP_INSERT
+            "flags": 1,
+            "db": "test",
+            "collection": "fuzzing",
+            "documents": [
+                {
+                    "_id": 0,
+                    "number": 100,
+                    "str": "hello there",
+                    "obj":{"nested": "stuff"}
+                }
+            ]
+        })
+    ```
+* An example request containing one kill cursor message:
+    - This request contains a nested block, so that if this request is extended, future sulley primitives can reference the block by name.
+    ```python
+    s_initialize("kill cursor")
+    if s_block_start("kill_cursor_msg"):
+        s_lego("OP_KILL_CURSORS", options=
+        {
+            "requestID": 124098,
+            "numberOfCursorIDs": 5,
+            "cursorIDs": [
+                2346245,
+                123465663,
+                76254,
+                85662214,
+                6245246
+            ]
+        })
+    s_block_end("kill_cursor_msg")
+    ```
+* An example of an update message
+    ```python
+    s_initialize("update")
+    s_lego("OP_UPDATE", options=
+        {
+            "requestID": 56163,
+            "db": "test",
+            "collection": "fuzzing",
+            "flags": 1,
+            "selector": {
+                "_id": 0,
+            },
+            "update":{
+                "number": 11,
+                "str": "Hello again",
+                "obj":{"birds": "nest"}
+            }
+        })
+    ```
 
 ## Developer info
 To be continued
-
-
-
-
-
-
-
-
