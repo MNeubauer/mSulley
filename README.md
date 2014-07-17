@@ -29,8 +29,17 @@ This tool is a fuzz tester for the MongoDB wire. A user can create messages that
 * Specify `-h` for more options
 
 ## Getting Started
-To be continued
+### Dependencies
+see [requirements.txt](./requirements.txt)
+ - bson
+    - requirements currently use pymongo for its bson module
 
+* **Network monitoring dependencies**
+    - pcapy - a python interface for the libpcap packet capture library
+        - `apt-get install python-pcapy` will install the package on an Ubuntu
+        - If you are using virtualenv the following command will copy your Ubuntu package into the virtual environment `cp /usr/lib/python2.7/dist-packages/*pcapy*  <PATH_TO_VIRTUAL_ENV>/myenv1/lib/python2.7/site-packages/`
+    - pip packages
+        - impacket
 
 ## Design
 * The purpose of this project is to allow developers and testers a way to easily send well formed MongoDB wire messages to a mongod server. This is accomplished by having an interface that allows users to specify the intuitive content of the message without being conerned with low level details such as bit ordering or Sulley internals.
