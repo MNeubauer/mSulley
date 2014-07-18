@@ -1,8 +1,8 @@
-# Fuzzing the MongoDB Wire
-A tool for exposing hidden bugs using unexpected input
+# Sulley for MongoDB
+A fuzzer compatible with the MongoDB wire protocol
 
 ## Overview
-This tool is a fuzz tester for the MongoDB wire. A user can create messages that will be iteratively modified, mutated, and subsequently sent to a mongod server. This iterative process is handled mainly by internals of the Sulley fuzzing framework. Communicating with the framework is programatic and relatively simple.
+This tool is a fuzz tester for the MongoDB wire. A user can create messages that will be iteratively modified, mutated, and subsequently sent to a mongod server. This iterative process is handled mainly by internals of the Sulley fuzzing framework. Communicating with the framework is programatic and relatively simple. To use this tool for actual MongoDB testing, see the [WireFuzz](https://github.com/10gen-interns/fuzzing/tree/matt/wirefuzz) and ensure that the requirements.txt file in that repo contains the correct branch of this repo.
 
 
 ## Sulley
@@ -18,28 +18,13 @@ This tool is a fuzz tester for the MongoDB wire. A user can create messages that
     - **Sessions** are a graph of requests, that constitute one or more full conversations between Sulley and a server.
     - Sulley also has some tools available for post mortem analysis and test case replay. See the below for details.
 
-## Post Mortem Tools
-**[byte_repeat.py](./post_mortem/byte_repeat.py)** is a python script that sends a test case or sequence of test cases previously sent by Sulley.
-* Example calls from the post_mortem directory:
-    - `python byte_repeat.py -n 175` will load and send the contents of one test case file (175.txt) over the wire to a mongod server.
-    - `python byte_repeat.py -p texts/` will load the test cases located in the `texts/` folder and send their contents to a mongod server.
-        - When `-n` is not specified, the script will search `texts/` (or the specified directory) for `1.txt`. If this file exists, the script will load this text file with every subsequent in-order `<#>.txt` file. If it does not exist, the script will exit.
-            - If the directory contains `1.txt` `2.txt` and `3.txt`, all three will be sent over the wire.
-            - If the directory contains `1.txt` `3.txt` and `4.txt`, only `1.txt` will be sent over the wire.
-* Specify `-h` for more options
 
 ## Getting Started
 ### Dependencies
 see [requirements.txt](./requirements.txt)
+to install dependencies run `pip install -r requirements.txt`
  - bson
     - requirements currently use pymongo for its bson module
-
-* **Network monitoring dependencies**
-    - pcapy - a python interface for the libpcap packet capture library
-        - `apt-get install python-pcapy` will install the package on an Ubuntu
-        - If you are using virtualenv the following command will copy your Ubuntu package into the virtual environment `cp /usr/lib/python2.7/dist-packages/*pcapy*  <PATH_TO_VIRTUAL_ENV>/myenv1/lib/python2.7/site-packages/`
-    - pip packages
-        - impacket
 
 ## Design
 * The purpose of this project is to allow developers and testers a way to easily send well formed MongoDB wire messages to a mongod server. This is accomplished by having an interface that allows users to specify the intuitive content of the message without being conerned with low level details such as bit ordering or Sulley internals.
