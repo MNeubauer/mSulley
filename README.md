@@ -32,7 +32,7 @@ To install dependencies run `pip install -r requirements.txt`
 * One of the main reasons Sulley was selected as the framework for fuzzing the MongoDB wire was that the user's code is written in a programming language (python) and can take advantage of its facilities.
 
 * **Lego's** take advantage of pythons facilities and their use encourage a programatic way of representing wire messages that encourages code reuse - especially via inheritance. Each MongoDB command can be represented as its own lego which can be found in [mSulley/sulley/legos/mongo.py](./mSulley/sulley/legos/mongo.py).
-    - All legos extend Sulley's [block](./mSulley/sulley/blocks) class. The [Mongo_op](./mSulley/sulley/legos/Mongo_op) extends the block class and is a base class for legos that represent MongoDB messages. Mongo_op has a few main purposes:
+    - All legos extend Sulley's [block](./mSulley/sulley/blocks.py) class. The [Mongo_op](./mSulley/sulley/legos/Mongo_op.py) extends the block class and is a base class for legos that represent MongoDB messages. Mongo_op has a few main purposes:
         - Create the MsgHeader for each message
         - Hide some repeated code making it easier to read the code in its subclasses
         - Wrap simple lines of code if they are planned to become more complex in the future
@@ -147,7 +147,7 @@ class OP_NEW(Mongo_op.Mongo_op):
         # Always end with this command!
         self.end_block()
 ```
-In order to reference this new lego in a request, you must also add the following line to [mSully/sully/legos/\__init\__.py](mSulley/sully/legos/\__init\__.py)
+In order to reference this new lego in a request, you must also add the following line to [mSulley/sulley/legos/\__init\__.py](mSulley/sulley/legos/\__init\__.py)
 ```python
 BIN["OP_NEW"] = mongo.OP_NEW
 ```
