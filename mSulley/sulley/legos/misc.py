@@ -1,5 +1,5 @@
 import struct
-from sulley import blocks, primitives, sex
+from mSulley.sulley import blocks, primitives, sex
 
 
 ########################################################################################################################
