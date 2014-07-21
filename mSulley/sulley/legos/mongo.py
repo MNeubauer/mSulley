@@ -1,9 +1,9 @@
 #from sulley import primitives, blocks, legos
-from sulley import *
+from mSulley.sulley import *
 from struct import pack
 from random import randint
 from random import seed
-from sulley.legos import Mongo_op
+from mSulley.sulley.legos import Mongo_op
 
 seed(6)
        

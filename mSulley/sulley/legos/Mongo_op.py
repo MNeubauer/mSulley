@@ -1,5 +1,5 @@
-from sulley import blocks
-from sulley import primitives
+from mSulley.sulley import blocks
+from mSulley.sulley import primitives
 from random import seed
 from random import randint
 from random import getrandbits

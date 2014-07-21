@@ -7,7 +7,7 @@ This tool is a fuzz tester for the MongoDB wire. A user can create messages that
 
 ## Sulley
 * This tool was built on the Sulley Fuzzer, for detailed information see the following pages
-    - For the official sulley readme, see [SULLEY.md](./SULLEY.md)
+    - For the official sulley readme, see [SULLEY.md](./mSulley/SULLEY.md)
     - For the tutorial/manual, see the [Sulley Manual](http://www.fuzzing.org/wp-content/SulleyManual.pdf)
 
 * The Basics

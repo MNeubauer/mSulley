@@ -1,4 +1,4 @@
-from sulley import *
+from mSulley.sulley import *
 from pymongo import MongoClient
 
 DBNAME = "test"

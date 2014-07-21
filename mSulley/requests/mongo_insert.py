@@ -1,4 +1,4 @@
-from sulley import *
+from mSulley.sulley import *
 
 s_initialize("one insert")
 if s_block_start("insert block"):
