@@ -1,11 +1,11 @@
-import sulley.blocks
-import sulley.instrumentation
-import sulley.legos
-import sulley.pedrpc
-import sulley.primitives
-import sulley.sex
-import sulley.sessions
-import sulley.utils
+import mSulley.sulley.blocks
+import mSulley.sulley.instrumentation
+import mSulley.sulley.legos
+import mSulley.sulley.pedrpc
+import mSulley.sulley.primitives
+import mSulley.sulley.sex
+import mSulley.sulley.sessions
+import mSulley.sulley.utils
 
 BIG_ENDIAN      = ">"
 LITTLE_ENDIAN   = "<"
