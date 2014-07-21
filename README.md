@@ -2,29 +2,29 @@
 A fuzzer compatible with the MongoDB wire protocol
 
 ## Overview
-This tool is a fuzz tester for the MongoDB wire. A user can create messages that will be iteratively modified, mutated, and subsequently sent to a mongod server. This iterative process is handled mainly by internals of the Sulley fuzzing framework. Communicating with the framework is programatic and relatively simple. To use this tool for actual MongoDB testing, see the [WireFuzz](https://github.com/10gen-interns/fuzzing/tree/matt/wirefuzz) and ensure that the requirements.txt file in that repo contains the correct branch of this repo.
+This tool is a fuzz tester for the MongoDB wire. A user can create messages that will be iteratively modified, mutated, and subsequently sent to a mongod server. This iterative process is handled mainly by internals of the Sulley fuzzing framework. Communicating with the framework is programatic and relatively simple. To use this tool for actual MongoDB testing, see the [WireFuzz github repository](https://github.com/10gen-interns/fuzzing/tree/matt/wirefuzz) and ensure that the requirements.txt file in that repo contains the correct branch of this repo.
 
 
 ## Sulley
-* This tool was built on they Sulley Fuzzer, for detailed information see the following pages
+* This tool was built on the Sulley Fuzzer, for detailed information see the following pages
     - For the official sulley readme, see [SULLEY.md](./SULLEY.md)
     - For the tutorial/manual, see the [Sulley Manual](http://www.fuzzing.org/wp-content/SulleyManual.pdf)
 
 * The Basics
-    - **Primitives** are the lowest level item in Sulley. They are used to describe different types of simple data objects such as integers, strings, static data, and random data.
-    - **Legos** are user defined primitives, more on this later as this facility is heavily relied on for testing the MongoDB wire.
+    - **Primitives** are the lowest level item in Sulley. They are used to describe different types of simple data objects such as integers, strings, static data, and Sulley generated random data.
+    - **Legos** are user defined primitives, more on this faculty later as it is heavily relied on for testing the MongoDB wire.
     - **Blocks** are groups of primitives. Blocks are also primitives, and can therefore be nested within each other.
     - **Requests** are a sequence of blocks and primitives that represent one part of a conversation between Sulley and a server.
     - **Sessions** are a graph of requests, that constitute one or more full conversations between Sulley and a server.
-    - Sulley also has some tools available for post mortem analysis and test case replay. See the below for details.
+    - Sulley also has some tools available for post mortem analysis and test case replay. For details on what is supported see the [Post Mortem Tools](https://github.com/10gen-interns/fuzzing/blob/matt/wirefuzz/README.md#post-mortem-tools) section of the README.md dedicated to testing the MongoDB wire.
 
 
 ## Getting Started
 ### Dependencies
-see [requirements.txt](./requirements.txt)
-to install dependencies run `pip install -r requirements.txt`
- - bson
-    - requirements currently use pymongo for its bson module
+See [requirements.txt](./requirements.txt)  
+To install dependencies run `pip install -r requirements.txt`  
+ - pymongo
+    - Testing currently depends on pymongo for its bson module
 
 ## Design
 * The purpose of this project is to allow developers and testers a way to easily send well formed MongoDB wire messages to a mongod server. This is accomplished by having an interface that allows users to specify the intuitive content of the message without being conerned with low level details such as bit ordering or Sulley internals.
@@ -32,9 +32,9 @@ to install dependencies run `pip install -r requirements.txt`
 * One of the main reasons Sulley was selected as the framework for fuzzing the MongoDB wire was that the user's code is written in a programming language (python) and can take advantage of its facilities.
 
 * **Lego's** take advantage of pythons facilities and their use encourage a programatic way of representing wire messages that encourages code reuse - especially via inheritance. Each MongoDB command can be represented as its own lego which can be found in [sulley/legos/mongo.py](./sulley/legos/mongo.py).
-    - All legos in Sulley's [block](./sulley/blocks) class. The [Mongo_op](./sulley/legos/Mongo_op) extends the block class and is a base class for legos that represent MongoDB messages. Mongo_op has a few main purposes:
-        - Create the msgHeader for each message
-        - Hides some repeated code making it easier to read the code in its subclasses
+    - All legos extend Sulley's [block](./sulley/blocks) class. The [Mongo_op](./sulley/legos/Mongo_op) extends the block class and is a base class for legos that represent MongoDB messages. Mongo_op has a few main purposes:
+        - Create the MsgHeader for each message
+        - Hide some repeated code making it easier to read the code in its subclasses
         - Wrap simple lines of code if they are planned to become more complex in the future
             - E.G. Making the bson interpretation more complex
 
@@ -44,14 +44,14 @@ to install dependencies run `pip install -r requirements.txt`
 * All `lego_type`'s can be found in [sulley/legos/\__init\__.py](sulley/legos/__init__.py)
 * Calls to s_lego for MongoDB messages use the options dict as a way of passing initial values for the message.
 * See the [MongoDB wire protocol spec](http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/) for details on what is expected for each message.
-* Notes on the **MsgHeader**:
-    - The messageLength field is calculated by a sizer upon initialization of each lego
-    - The opCode field is implied by the type of lego that is called
-    - It is suggested that the user leave out the responseTo field
-        - SSL handshake is expected if this field is not 0 or -1
-        - The fuzzer will test across both of these values if the field is not specified
-* The `fullCollectionName` field is not expected. Instead pass separate `db` and `collection` fields wherever the spec calls for `fullCollectionName`. This is so Sulley can fuzz the delimiter properly.
-* Legos currently do not expect options for fields that are reserved and filled with zeros.
+    - Notes on the **MsgHeader**:
+        - The messageLength field is calculated by a sizer upon initialization of each lego and should not be specified
+        - The opCode field is implied by the type of lego that is called and should also not be specified
+        - It is suggested that the user not specify the responseTo field
+            - SSL handshake is expected if this field is not 0 or -1
+            - The fuzzer will test across both of these values if the field is not specified
+    - The `fullCollectionName` field is not expected. Instead pass separate `db` and `collection` fields wherever the spec calls for `fullCollectionName`. This is so Sulley can fuzz the delimiter properly.
+    - Legos currently do not expect options for fields that are reserved and filled with zeros.
 * Multiple requests can be made per file in a the [requests](./requests) directory.
 * Each request starts with `s_initialize("example request")`.
     - A session uses this request as a node with a call to `sess.connect("example request")`.
@@ -78,7 +78,7 @@ s_lego("OP_INSERT", options=
     })
 ```
 * An example request containing one kill cursor message:
-    - This request contains a nested block, so that if this request is extended, future sulley primitives can reference the block by name.
+    - This request contains a lego nested in a block, so that if this request is extended, future sulley primitives can reference the block by name.
 ```python
 s_initialize("kill cursor")
 if s_block_start("kill_cursor_msg"):
@@ -118,7 +118,7 @@ s_lego("OP_UPDATE", options=
 
 ## Developer info
 ### New Wire Messages
-* Creating a simple MongoDB message lego using [Mongo_op](./sulley/legos/Mongo_op.py):
+* Below is a rough template of what a new massage may look like when implemented using Sulley. Like all other MongoDB messages, it extends the [Mongo_op](./sulley/legos/Mongo_op.py) class.
 ```python
 class OP_NEW(Mongo_op.Mongo_op):
     """This sulley lego represents an OP_NEW MongoDB message"""
@@ -127,8 +127,9 @@ class OP_NEW(Mongo_op.Mongo_op):
         options = self.init_options(options, NEW_OPCODE)
         Mongo_op.Mongo_op.__init__(self, name, request, options)
         
-        # Save the appropriate options in case we need to 
-        # reference them again in the future and set defaults
+        # Save the appropriate options in case we need to reference them 
+        # again in the future
+        # set defaults
         self.db = options.get("db", "test")
         self.collection = options.get("collection", "fuzzing")
         self.flags = options.get("flags", NEW_FLAGS)
@@ -146,7 +147,7 @@ class OP_NEW(Mongo_op.Mongo_op):
         # Always end with this command!
         self.end_block()
 ```
-In order to reference the new lego in a request, you must also add the following line to [sully/legos/\__init\__.py](sully/legos/\__init\__.py)
+In order to reference this new lego in a request, you must also add the following line to [sully/legos/\__init\__.py](sully/legos/\__init\__.py)
 ```python
 BIN["OP_NEW"] = mongo.OP_NEW
 ```
