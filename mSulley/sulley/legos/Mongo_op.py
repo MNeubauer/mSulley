@@ -1,4 +1,4 @@
-from mSulley.sulley import blocks
+from mSulley.sulley.blocks import block as s_block
 from mSulley.sulley import primitives
 from random import seed
 from random import randint
@@ -6,14 +6,16 @@ from random import getrandbits
 from struct import pack
 from bson import BSON
 
+# Sulley is a deterministic fuzzer. This seed is set to keep client code
+# deterministic as well. The actual seed was chosen randomly.
 seed(475)
 
-class Mongo_op(blocks.block):
+class Mongo_op(s_block):
     """An abstract class representing all legos for MongoDB operations"""
     def __init__(self, name, request, options):
-        blocks.block.__init__(self, name, request, None, None, None, None)
+        s_block.__init__(self, name, request, None, None, None, None)
         self.block_name = name + "_"
-        self.block = blocks.block(self.block_name, request)
+        self.block = s_block(self.block_name, request)
         self.requestID = options.get("requestID", randint(1, (2**31)-1))
         self.responseTo = options.get("responseTo", 
                                           [pack('<i',0), pack('<i',-1)])
@@ -49,7 +51,7 @@ class Mongo_op(blocks.block):
             OP_KILL_CURSORS  2007   Tell database client is done with a cursor
         """
         # Size the inner block.
-        blocks.block.push(self, blocks.size(self.block_name, 
+        s_block.push(self, blocks.size(self.block_name, 
                                             self.request, 
                                             inclusive=True, 
                                             signed=True))
@@ -75,4 +77,4 @@ class Mongo_op(blocks.block):
         self.block.push(item)
 
     def end_block(self):
-        blocks.block.push(self, self.block)
+        s_block.push(self, self.block)

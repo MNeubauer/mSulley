@@ -7,7 +7,7 @@ import os
 import pcapy
 import impacket
 import impacket.ImpactDecoder
-from sulley import pedrpc
+from mSulley.sulley import pedrpc
 
 
 def log_error(message=None):

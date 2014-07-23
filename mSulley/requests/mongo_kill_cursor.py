@@ -1,4 +1,7 @@
-from mSulley.sulley import *
+from mSulley.sulley import s_initialize
+from mSulley.sulley import s_block_start
+from mSulley.sulley import s_block_end
+from mSulley.sulley import s_lego
 from pymongo import MongoClient
 
 DBNAME = "test"
@@ -11,15 +14,23 @@ db[COLNAME].drop()
 
 
 ###############################################################################
-for i in range(0,1000):
+for i in xrange(1000):
     db[COLNAME].insert({"a":i})
 
 cursors = []
-for i in range(0,7):
+for i in xrange(7):
     cursor = db[COLNAME].find().sort('a').limit(10)
-    for Doc in cursor:
+    for doc in cursor:
         cursors.append(cursor.cursor_id)
+        # We are only interested in getting the cursor ID which can be 
+        # acquired after one step through the cursor iteration, so we 
+        # do not need to continue.
         break
+
+# Note, the cursors seem to get deleted before the Sulley code begins to 
+# execute. More time needs to be spent understanding what is happening
+# to make the above code useful or find a different way to get code
+# coverage using a kill cursor command.
 
 s_initialize("one kill cursor")
 # The block is only actually necessary if you 

@@ -1,4 +1,7 @@
-from mSulley.sulley import *
+from mSulley.sulley import s_initialize
+from mSulley.sulley import s_block_start
+from mSulley.sulley import s_block_end
+from mSulley.sulley import s_lego
 
 s_initialize("one insert")
 if s_block_start("insert block"):
