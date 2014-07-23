@@ -1,4 +1,5 @@
 from mSulley.sulley.blocks import block as s_block
+from mSulley.sulley.blocks import size as s_sizer
 from mSulley.sulley import primitives
 from random import seed
 from random import randint
@@ -51,10 +52,10 @@ class Mongo_op(s_block):
             OP_KILL_CURSORS  2007   Tell database client is done with a cursor
         """
         # Size the inner block.
-        s_block.push(self, blocks.size(self.block_name, 
-                                            self.request, 
-                                            inclusive=True, 
-                                            signed=True))
+        s_block.push(self, s_sizer(self.block_name, 
+                                   self.request, 
+                                   inclusive=True, 
+                                   signed=True))
         # Add the rest of the header to the inner block.
         self.block.push(primitives.dword(self.requestID, signed=True))
         if isinstance(self.responseTo, list):
