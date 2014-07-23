@@ -11,7 +11,7 @@ from bson import BSON
 # deterministic as well. The actual seed was chosen randomly.
 seed(475)
 
-class Mongo_op(s_block):
+class MongoMsg(s_block):
     """An abstract class representing all legos for MongoDB operations"""
     def __init__(self, name, request, options):
         s_block.__init__(self, name, request, None, None, None, None)

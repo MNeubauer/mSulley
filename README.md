@@ -32,7 +32,7 @@ To install dependencies run `pip install -r requirements.txt`
 * One of the main reasons Sulley was selected as the framework for fuzzing the MongoDB wire was that the user's code is written in a programming language (python) and can take advantage of its facilities.
 
 * **Lego's** take advantage of pythons facilities and their use encourage a programatic way of representing wire messages that encourages code reuse - especially via inheritance. Each MongoDB command can be represented as its own lego which can be found in [mSulley/sulley/legos/mongo.py](./mSulley/sulley/legos/mongo.py).
-    - All legos extend Sulley's [block](./mSulley/sulley/blocks.py) class. The [Mongo_op](./mSulley/sulley/legos/Mongo_op.py) extends the block class and is a base class for legos that represent MongoDB messages. Mongo_op has a few main purposes:
+    - All legos extend Sulley's [block](./mSulley/sulley/blocks.py) class. The [MongoMsg](./mSulley/sulley/legos/MongoMsg.py) extends the block class and is a base class for legos that represent MongoDB messages. MongoMsg has a few main purposes:
         - Create the MsgHeader for each message
         - Hide some repeated code making it easier to read the code in its subclasses
         - Wrap simple lines of code if they are planned to become more complex in the future
@@ -118,14 +118,14 @@ s_lego("OP_UPDATE", options=
 
 ## Developer info
 ### New Wire Messages
-* Below is a rough template of what a new massage may look like when implemented using Sulley. Like all other MongoDB messages, it extends the [Mongo_op](./mSulley/sulley/legos/Mongo_op.py) class.
+* Below is a rough template of what a new massage may look like when implemented using Sulley. Like all other MongoDB messages, it extends the [MongoMsg](./mSulley/sulley/legos/MongoMsg.py) class.
 ```python
-class OP_NEW(Mongo_op.Mongo_op):
+class OP_NEW(MongoMsg):
     """This sulley lego represents an OP_NEW MongoDB message"""
     def __init__(self, name, request, value, options):
         # Create the super class and push a header to the block.
         options = self.init_options(options, NEW_OPCODE)
-        Mongo_op.Mongo_op.__init__(self, name, request, options)
+        MongoMsg.__init__(self, name, request, options)
         
         # Save the appropriate options in case we need to reference them 
         # again in the future

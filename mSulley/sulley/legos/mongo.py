@@ -2,7 +2,7 @@ from mSulley.sulley import primitives
 from struct import pack
 from random import randint
 from random import seed
-from mSulley.sulley.legos.Mongo_op import Mongo_op
+from mSulley.sulley.legos.MongoMsg import MongoMsg
 
 # Sulley is a deterministic fuzzer. This seed is set to keep client code
 # deterministic as well. The actual seed was chosen randomly.
@@ -31,12 +31,12 @@ seed(6)
     2-31        Reserved    Must be set to 0.
 
 """
-class OP_UPDATE(Mongo_op):
+class OP_UPDATE(MongoMsg):
     """This sulley lego represents an OP_UPDATE MongoDB message"""
     def __init__(self, name, request, value, options):
         # Create the super class and push a header to the block.
         options = self.init_options(options, 2001)
-        Mongo_op.__init__(self, name, request, options)
+        MongoMsg.__init__(self, name, request, options)
         
         self.db = options.get("db", "test")
         self.collection = options.get("collection", "fuzzing")
@@ -79,12 +79,12 @@ class OP_UPDATE(Mongo_op):
                                     getLastError.
     1-31        Reserved            Must be set to 0
 """
-class OP_INSERT(Mongo_op):
+class OP_INSERT(MongoMsg):
     """This sulley lego represents an OP_INSERT MongoDB message."""
     def __init__(self, name, request, value,  options):
         # Create the super class and push a header to the block.
         options = self.init_options(options, 2002)
-        Mongo_op.__init__(self, name, request, options)
+        MongoMsg.__init__(self, name, request, options)
 
         self.flags = options.get("flags", 1)
         self.db = options.get("db", "test")
@@ -113,12 +113,12 @@ class OP_INSERT(Mongo_op):
 """
 # Need to come up with a way to have cursors and know their cursor_id
 
-class OP_KILL_CURSORS(Mongo_op):
+class OP_KILL_CURSORS(MongoMsg):
     """This sulley lego represents an OP_KILL_CURSORS MongoDB message."""
     def __init__(self, name, request, value, options):
         # Create the super class and push a header to the block.
         options = self.init_options(options, 2007)
-        Mongo_op.__init__(self, name, request, options)
+        MongoMsg.__init__(self, name, request, options)
 
         self.numberOfCursorIDs = options.get('numberOfCursorIDs', 10)
         self.cursorIDs = options.get('cursorIDs', None)
