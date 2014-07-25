@@ -4,9 +4,9 @@ from mSulley.sulley import s_block_end
 from mSulley.sulley import s_lego
 
 ###############################################################################
-# Requests from this page
-sess.connect(s_get("one insert"))
-sess.connect(s_get("get more"))
+#### Requests from this page which may be copy and pasted to session files ####
+# sess.connect(s_get("one insert"))
+# sess.connect(s_get("get more"))
 ###############################################################################
 
 s_initialize("one insert")
