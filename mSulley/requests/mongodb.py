@@ -3,6 +3,12 @@ from mSulley.sulley import s_block_start
 from mSulley.sulley import s_block_end
 from mSulley.sulley import s_lego
 
+###############################################################################
+# Requests from this page
+sess.connect(s_get("one insert"))
+sess.connect(s_get("get more"))
+###############################################################################
+
 s_initialize("one insert")
 if s_block_start("insert block"):
     s_lego("OP_INSERT", None, options=
@@ -22,3 +28,7 @@ if s_block_start("insert block"):
             ]
         })
 s_block_end("insert block")
+
+
+s_initialize("get more")
+s_lego("OP_GET_MORE")

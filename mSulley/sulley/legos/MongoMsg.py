@@ -1,6 +1,10 @@
 from mSulley.sulley.blocks import block as s_block
 from mSulley.sulley.blocks import size as s_sizer
-from mSulley.sulley import primitives
+from mSulley.sulley.primitives import dword
+from mSulley.sulley.primitives import random_data
+from mSulley.sulley.primitives import group
+from mSulley.sulley.primitives import delim
+from mSulley.sulley.primitives import string
 from random import seed
 from random import randint
 from random import getrandbits
@@ -39,7 +43,7 @@ class MongoMsg(s_block):
                 int32   opCode;        // request type - see table below
             }
 
-            opCode      value   Comments
+            opCode           value  Comments
             
             OP_REPLY         1      Reply to a client request. responseTo is set
             OP_MSG           1000   generic msg command followed by a string
@@ -57,21 +61,21 @@ class MongoMsg(s_block):
                                    inclusive=True, 
                                    signed=True))
         # Add the rest of the header to the inner block.
-        self.block.push(primitives.dword(self.requestID, signed=True))
+        self.block.push(dword(self.requestID, signed=True))
         if isinstance(self.responseTo, list):
-            self.block.push(primitives.group(self.block_name + "responseTo",
+            self.block.push(group(self.block_name + "responseTo",
                                              self.responseTo))
         else:
-            self.block.push(primitives.dword(self.responseTo, signed=True))
-        self.block.push(primitives.dword(self.opCode, signed=True))
+            self.block.push(dword(self.responseTo, signed=True))
+        self.block.push(dword(self.opCode, signed=True))
 
     def push_namespace(self, db, collection):
-        self.block.push(primitives.string(db))
-        self.block.push(primitives.delim("."))
-        self.block.push(primitives.string(collection))
+        self.block.push(string(db))
+        self.block.push(delim("."))
+        self.block.push(string(collection))
 
     def push_bson_doc(self, doc):
-        self.block.push(primitives.random_data(
+        self.block.push(random_data(
             BSON.encode(doc), 0, 16*(2**20)))
 
     def push(self, item):
