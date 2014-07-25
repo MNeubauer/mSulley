@@ -141,6 +141,7 @@ class OP_INSERT(MongoMsg):
 """
 class OP_QUERY(MongoMsg):
     """This sulley lego represents an OP_QUERY MongoDB message"""
+    def __init__(self, name, request, value, options):
         options = self.init_options(options, opCodes['query'])
         MongoMsg.__init__(self, name, request, options)
 
@@ -180,6 +181,7 @@ struct OP_GET_MORE {
 """
 class OP_GET_MORE(MongoMsg):
     """This sulley lego represents an OP_GET_MORE MongoDB message"""
+    def __init__(self, name, request, value, options):
         # Create the super class and push a header to the block.
         options = self.init_options(options, opCodes['get_more'])
         MongoMsg.__init__(self, name, request, options)
