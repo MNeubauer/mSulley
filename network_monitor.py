@@ -9,6 +9,7 @@ import impacket
 import impacket.ImpactDecoder
 from sulley import pedrpc
 
+IFS = []
 
 def log_error(message=None):
     try:
@@ -218,11 +219,10 @@ class NetworkMonitorPedrpcServer (pedrpc.server):
 
 
 ########################################################################################################################
-def main():
+def run_monitor():
     rpc_port = 26001
-    IFS = []
     opts = None
-    device      = None    
+    device      = None
     pcap_filter = ""
     log_path    = "./"
     log_level   = 1
@@ -258,5 +258,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run_monitor()
     
