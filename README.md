@@ -7,7 +7,7 @@ This tool is a fuzz tester for the MongoDB wire. A user can create messages that
 
 ## Sulley
 * This tool was built on the Sulley Fuzzer, for detailed information see the following pages
-    - For the official sulley readme, see [SULLEY.md](./mSulley/SULLEY.md)
+    - For the official sulley readme, see [SULLEY.md](./SULLEY.md)
     - For the tutorial/manual, see the [Sulley Manual](http://www.fuzzing.org/wp-content/SulleyManual.pdf)
 
 * The Basics
@@ -31,8 +31,8 @@ To install dependencies run `pip install -r requirements.txt`
 
 * One of the main reasons Sulley was selected as the framework for fuzzing the MongoDB wire was that the user's code is written in a programming language (python) and can take advantage of its facilities.
 
-* **Lego's** take advantage of pythons facilities and their use encourage a programatic way of representing wire messages that encourages code reuse - especially via inheritance. Each MongoDB command can be represented as its own lego which can be found in [mSulley/sulley/legos/mongo.py](./mSulley/sulley/legos/mongo.py).
-    - All legos extend Sulley's [block](./mSulley/sulley/blocks.py) class. The [MongoMsg](./mSulley/sulley/legos/MongoMsg.py) extends the block class and is a base class for legos that represent MongoDB messages. MongoMsg has a few main purposes:
+* **Lego's** take advantage of pythons facilities and their use encourage a programatic way of representing wire messages that encourages code reuse - especially via inheritance. Each MongoDB command can be represented as its own lego which can be found in [sulley/legos/mongo.py](./sulley/legos/mongo.py).
+    - All legos extend Sulley's [block](./sulley/blocks.py) class. The [MongoMsg](./sulley/legos/MongoMsg.py) extends the block class and is a base class for legos that represent MongoDB messages. MongoMsg has a few main purposes:
         - Create the MsgHeader for each message
         - Hide some repeated code making it easier to read the code in its subclasses
         - Wrap simple lines of code if they are planned to become more complex in the future
@@ -41,7 +41,7 @@ To install dependencies run `pip install -r requirements.txt`
 ## Usage
 ### Requests
 * The Sulley definition of a call for a lego is `def s_lego(lego_type, value=None, options={})`
-* All `lego_type`'s can be found in [mSulley/sulley/legos/\__init\__.py](mSulley/sulley/legos/__init__.py)
+* All `lego_type`'s can be found in [sulley/legos/\__init\__.py](sulley/legos/__init__.py)
 * Calls to s_lego for MongoDB messages use the options dict as a way of passing initial values for the message.
 * See the [MongoDB wire protocol spec](http://docs.mongodb.org/meta-driver/latest/legacy/mongodb-wire-protocol/) for details on what is expected for each message.
     - Notes on the **MsgHeader**:
@@ -52,7 +52,7 @@ To install dependencies run `pip install -r requirements.txt`
             - The fuzzer will test across both of these values if the field is not specified
     - The `fullCollectionName` field is not expected. Instead pass separate `db` and `collection` fields wherever the spec calls for `fullCollectionName`. This is so Sulley can fuzz the delimiter properly.
     - Legos currently do not expect options for fields that are reserved and filled with zeros.
-* Multiple requests can be made per file in a the [mSulley/requests](./mSulley/requests) directory.
+* Multiple requests can be made per file in a the [requests/](./requests) directory.
 * Each request starts with `s_initialize("example request")`.
     - A session uses this request as a node with a call to `sess.connect("example request")`.
 
@@ -118,7 +118,7 @@ s_lego("OP_UPDATE", options=
 
 ## Developer info
 ### New Wire Messages
-* Below is a rough template of what a new massage may look like when implemented using Sulley. Like all other MongoDB messages, it extends the [MongoMsg](./mSulley/sulley/legos/MongoMsg.py) class.
+* Below is a rough template of what a new massage may look like when implemented using Sulley. Like all other MongoDB messages, it extends the [MongoMsg](./sulley/legos/MongoMsg.py) class.
 ```python
 class OP_NEW(MongoMsg):
     """This sulley lego represents an OP_NEW MongoDB message"""
@@ -147,7 +147,7 @@ class OP_NEW(MongoMsg):
         # Always end with this command!
         self.end_block()
 ```
-In order to reference this new lego in a request, you must also add the following line to [mSulley/sulley/legos/\__init\__.py](mSulley/sulley/legos/\__init\__.py)
+In order to reference this new lego in a request, you must also add the following line to [sulley/legos/\__init\__.py](sulley/legos/\__init\__.py)
 ```python
 BIN["OP_NEW"] = mongo.OP_NEW
 ```

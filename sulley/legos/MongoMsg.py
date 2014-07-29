@@ -1,10 +1,10 @@
-from mSulley.sulley.blocks import block as s_block
-from mSulley.sulley.blocks import size as s_sizer
-from mSulley.sulley.primitives import dword
-from mSulley.sulley.primitives import random_data
-from mSulley.sulley.primitives import group
-from mSulley.sulley.primitives import delim
-from mSulley.sulley.primitives import string
+from sulley.blocks import block as s_block
+from sulley.blocks import size as s_sizer
+from sulley.primitives import dword
+from sulley.primitives import random_data
+from sulley.primitives import group
+from sulley.primitives import delim
+from sulley.primitives import string
 from random import seed
 from random import randint
 from random import getrandbits

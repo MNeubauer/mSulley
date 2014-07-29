@@ -15,7 +15,7 @@
 #    int32   opCode;        // request type - see table below
 # }
 
-from sulley import *
+from sulley import s_int, s_string, s_delim, s_random, s_initialize, s_block_start, s_block_end, s_size
 from pymongo import MongoClient
 
 DBNAME = "test"

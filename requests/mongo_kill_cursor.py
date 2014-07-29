@@ -1,7 +1,7 @@
-from mSulley.sulley import s_initialize
-from mSulley.sulley import s_block_start
-from mSulley.sulley import s_block_end
-from mSulley.sulley import s_lego
+from sulley import s_initialize
+from sulley import s_block_start
+from sulley import s_block_end
+from sulley import s_lego
 from pymongo import MongoClient
 
 DBNAME = "test"

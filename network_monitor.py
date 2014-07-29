@@ -7,7 +7,7 @@ import os
 import pcapy
 import impacket
 import impacket.ImpactDecoder
-from mSulley.sulley import pedrpc
+from sulley import pedrpc
 
 
 def log_error(message=None):
@@ -218,9 +218,7 @@ class NetworkMonitorPedrpcServer (pedrpc.server):
 
 
 ########################################################################################################################
-
-
-if __name__ == "__main__":
+def main():
     rpc_port = 26001
     IFS = []
     opts = None
@@ -257,3 +255,8 @@ if __name__ == "__main__":
         servlet.serve_forever()
     except:
         pass
+
+
+if __name__ == "__main__":
+    main()
+    

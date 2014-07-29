@@ -1,10 +1,10 @@
-from mSulley.sulley.primitives import dword
-from mSulley.sulley.primitives import qword
-from mSulley.sulley.primitives import group
+from sulley.primitives import dword
+from sulley.primitives import qword
+from sulley.primitives import group
+from sulley.legos.MongoMsg import MongoMsg
 from struct import pack
 from random import randint
 from random import seed
-from mSulley.sulley.legos.MongoMsg import MongoMsg
 
 # Sulley is a deterministic fuzzer. This seed is set to keep client code
 # deterministic as well. The actual seed was chosen randomly.
