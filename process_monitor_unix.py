@@ -236,8 +236,7 @@ class nix_process_monitor_pedrpc_server(pedrpc.server):
         return self.last_synopsis
     
 ########################################################################################################################
-
-if __name__ == "__main__":
+def run_monitor():
     # parse command line options.
     try:
         opts, args = getopt.getopt(sys.argv[1:], "c:P:l:", ["crash_bin=","port=","log_level=",])
@@ -262,3 +261,5 @@ if __name__ == "__main__":
     servlet = nix_process_monitor_pedrpc_server("0.0.0.0", PORT, crash_bin, log_level)
     servlet.serve_forever()
 
+if __name__ == "__main__":
+    run_monitor()
