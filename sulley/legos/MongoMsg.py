@@ -1,27 +1,24 @@
-from sulley.blocks import block as s_block
-from sulley.blocks import size as s_sizer
-from sulley.primitives import dword
-from sulley.primitives import random_data
-from sulley.primitives import group
-from sulley.primitives import delim
-from sulley.primitives import string
-from random import seed
-from random import randint
-from random import getrandbits
-from struct import pack
 from bson import BSON
+from pymongo.common import MAX_BSON_SIZE
+from random import seed, randint, getrandbits
+from struct import pack
+from sulley.blocks import (block as SulleyBlock,
+                           size as s_sizer)
+from sulley.primitives import dword, random_data, group, delim, string
 
 # Sulley is a deterministic fuzzer. This seed is set to keep client code
 # deterministic as well. The actual seed was chosen randomly.
+# TODO: Change the seed for each run, but record it so the run is reproducable.
 seed(475)
 
-class MongoMsg(s_block):
-    """An abstract class representing all legos for MongoDB operations"""
+class MongoMsg(SulleyBlock):
+    """A base class representing all legos for MongoDB operations"""
+
     def __init__(self, name, request, options):
-        s_block.__init__(self, name, request, None, None, None, None)
+        SulleyBlock.__init__(self, name, request, None, None, None, None)
         self.block_name = name + "_"
-        self.block = s_block(self.block_name, request)
-        self.requestID = options.get("requestID", randint(1, (2**31)-1))
+        self.block = SulleyBlock(self.block_name, request)
+        self.requestID = options.get("requestID", randint(0, (2**31)-1))
         self.responseTo = options.get("responseTo", 
                                           [pack('<i',0), pack('<i',-1)])
         self.opCode = options["opCode"]
@@ -45,7 +42,7 @@ class MongoMsg(s_block):
 
             opCode           value  Comments
             
-            OP_REPLY         1      Reply to a client request. responseTo is set
+            OP_REPLY         1      Reply to a client request
             OP_MSG           1000   generic msg command followed by a string
             OP_UPDATE        2001   update document
             OP_INSERT        2002   insert new document
@@ -56,7 +53,7 @@ class MongoMsg(s_block):
             OP_KILL_CURSORS  2007   Tell database client is done with a cursor
         """
         # Size the inner block.
-        s_block.push(self, s_sizer(self.block_name, 
+        SulleyBlock.push(self, s_sizer(self.block_name, 
                                    self.request, 
                                    inclusive=True, 
                                    signed=True))
@@ -64,7 +61,7 @@ class MongoMsg(s_block):
         self.block.push(dword(self.requestID, signed=True))
         if isinstance(self.responseTo, list):
             self.block.push(group(self.block_name + "responseTo",
-                                             self.responseTo))
+                                  self.responseTo))
         else:
             self.block.push(dword(self.responseTo, signed=True))
         self.block.push(dword(self.opCode, signed=True))
@@ -75,11 +72,11 @@ class MongoMsg(s_block):
         self.block.push(string(collection))
 
     def push_bson_doc(self, doc):
-        self.block.push(random_data(
-            BSON.encode(doc), 0, 16*(2**20)))
+        self.block.push(random_data(BSON.encode(doc), min_length=0,
+                        max_length=MAX_BSON_SIZE))
 
     def push(self, item):
         self.block.push(item)
 
     def end_block(self):
-        s_block.push(self, self.block)
+        SulleyBlock.push(self, self.block)

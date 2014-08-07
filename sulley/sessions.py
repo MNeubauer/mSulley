@@ -132,8 +132,8 @@ class session (pgraph.graph):
         '''
         Extends pgraph.graph and provides a container for architecting protocol dialogs.
 
-        @type  test_case_dir:     String
-        @kwarg test_case_dir:     (Optional, def=os.getcwd()) Path to directory where data sent to server is stored
+        @type  test_case_dir:      String
+        @kwarg test_case_dir:      (Optional, def=os.getcwd()) Path to directory where data sent to server is stored
 
         @type  session_filename:   String
         @kwarg session_filename:   (Optional, def=None) Filename to serialize persistant data to
@@ -165,7 +165,7 @@ class session (pgraph.graph):
 
         # Ensure the log path is a directory.
         if not os.path.isdir(test_case_dir):
-            sys.stderr.write('\"' + test_case_dir + "\" is not a directory, aborting\n")
+            sys.stderr.write('"' + test_case_dir + '" is not a directory, aborting\n')
             sys.exit()
 
 
@@ -496,7 +496,6 @@ class session (pgraph.graph):
                             # Connect is needed only for TCP stream
                             if self.proto == socket.SOCK_STREAM:
                                 sock.connect((target.host, target.port))
-                                print target, target.host, target.port
                         except Exception, e:
                             error_handler(e, "failed connecting on socket", target, sock)
                             continue

@@ -11,7 +11,7 @@ BIN["OP_UPDATE"]            = mongo.OP_UPDATE
 BIN["OP_INSERT"]            = mongo.OP_INSERT
 BIN["OP_QUERY"]             = mongo.OP_QUERY
 BIN["OP_GET_MORE"]          = mongo.OP_GET_MORE
-BIN["OP_DELETE"]             = mongo.OP_DELETE
+BIN["OP_DELETE"]            = mongo.OP_DELETE
 BIN["OP_KILL_CURSORS"]      = mongo.OP_KILL_CURSORS
 
 BIN["ber_string"]           = ber.string

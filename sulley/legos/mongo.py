@@ -1,10 +1,7 @@
-from sulley.primitives import dword
-from sulley.primitives import qword
-from sulley.primitives import group
+from sulley.primitives import dword, qword, group
 from sulley.legos.MongoMsg import MongoMsg
 from struct import pack
-from random import randint
-from random import seed
+from random import randint, seed
 
 # Sulley is a deterministic fuzzer. This seed is set to keep client code
 # deterministic as well. The actual seed was chosen randomly.
@@ -35,7 +32,7 @@ opCodes = {
     struct OP_UPDATE {
         MsgHeader header;               // standard message header_opts
         int32     ZERO;                 // 0 - reserved for future use
-        cstring   fullCollectionname;   // "dbname.collectionname"
+        cstring   fullCollectionName;   // "dbname.collectioname"
         int32     flags;                // bit vector. see below
         document  selector;             // the query to select the document
         document  update;               // specification of the update 
@@ -54,6 +51,7 @@ opCodes = {
 """
 class OP_UPDATE(MongoMsg):
     """This sulley lego represents an OP_UPDATE MongoDB message"""
+
     def __init__(self, name, request, value, options):
         # Create the super class and push a header to the block.
         options = self.init_options(options, opCodes['update'])
@@ -95,6 +93,7 @@ class OP_UPDATE(MongoMsg):
 """
 class OP_INSERT(MongoMsg):
     """This sulley lego represents an OP_INSERT MongoDB message."""
+
     def __init__(self, name, request, value,  options):
         # Create the super class and push a header to the block.
         options = self.init_options(options, opCodes['insert'])
@@ -141,10 +140,13 @@ class OP_INSERT(MongoMsg):
 """
 class OP_QUERY(MongoMsg):
     """This sulley lego represents an OP_QUERY MongoDB message"""
+
     def __init__(self, name, request, value, options):
         options = self.init_options(options, opCodes['query'])
         MongoMsg.__init__(self, name, request, options)
 
+        # 255 is 11111111 in (unsigned) binary, which represents
+        # the first 8 flags beging turned on.
         self.flags = options.get('flags', 255)
         self.db = options.get('db', 'test')
         self.collection = options.get('collection', 'fuzzing')
@@ -164,7 +166,7 @@ class OP_QUERY(MongoMsg):
         # document query
         self.push_bson_doc(self.query)
         # [document returnFieldsSelector]
-        if self.returnFieldsSelector != None:
+        if self.returnFieldsSelector is not None:
             self.push_bson_doc(self.returnFieldsSelector)
         self.end_block()
 
@@ -181,6 +183,7 @@ struct OP_GET_MORE {
 """
 class OP_GET_MORE(MongoMsg):
     """This sulley lego represents an OP_GET_MORE MongoDB message"""
+
     def __init__(self, name, request, value, options):
         # Create the super class and push a header to the block.
         options = self.init_options(options, opCodes['get_more'])
@@ -208,12 +211,13 @@ class OP_GET_MORE(MongoMsg):
         MsgHeader header;             // standard message header
         int32     ZERO;               // 0 - reserved for future use
         cstring   fullCollectionName; // "dbname.collectionname"
-        int32     flags;              // bit vector - see below for details.
-        document  selector;           // query object.  See below for details.
+        int32     flags;              // bit vector
+        document  selector;           // query object
     }
 """
 class OP_DELETE(MongoMsg):
-    """This sulley lego represents an OP_UPDATE MongoDB message"""
+    """This sulley lego represents an OP_DELETE MongoDB message"""
+
     def __init__(self, name, request, value, options):
         # Create the super class and push a header to the block.
         options = self.init_options(options, opCodes['delete'])
@@ -232,7 +236,7 @@ class OP_DELETE(MongoMsg):
         # int32 flags
         if isinstance(self.flags, list):
             self.block.push(group(name + "Flags",
-                                             self.flags))
+                                  self.flags))
         else:
             self.block.push(dword(self.flags, signed=True))
         # document selector
@@ -253,6 +257,7 @@ class OP_DELETE(MongoMsg):
 
 class OP_KILL_CURSORS(MongoMsg):
     """This sulley lego represents an OP_KILL_CURSORS MongoDB message."""
+
     def __init__(self, name, request, value, options):
         # Create the super class and push a header to the block.
         options = self.init_options(options, opCodes['kill_cursors'])
@@ -262,7 +267,7 @@ class OP_KILL_CURSORS(MongoMsg):
         self.cursorIDs = options.get('cursorIDs', None)
         if not self.cursorIDs or len(self.cursorIDs) != self.numberOfCursorIDs:
             self.cursorIDs = []
-            for i in range(0,self.numberOfCursorIDs):
+            for i in xrange(self.numberOfCursorIDs):
                 self.cursorIDs.append(randint(0,2**63-1))
 
         # int32 ZERO
@@ -270,8 +275,8 @@ class OP_KILL_CURSORS(MongoMsg):
         # int32 numberOfCursorIDs
         self.push(dword(self.numberOfCursorIDs, signed=True))
         # int64* cursorIDs
-        for ID in self.cursorIDs:
-            self.push(qword(ID, signed=True))
+        for cursor_id in self.cursorIDs:
+            self.push(qword(cursor_id, signed=True))
         self.end_block()
 
 ###############################################################################

@@ -27,7 +27,8 @@ def create_usage():
     [-l|--log_level LEVEL]    log level (default 1), increase for more verbosity
     [--port PORT]             TCP port to bind this agent to
 
-Network Device List:"""
+Network Device List:
+"""
     for index, pcapy_device in enumerate(pcapy.findalldevs()):
         IFS.append(pcapy_device)
         # if we are on windows, try and resolve the device UUID into an IP address.
@@ -171,9 +172,16 @@ class NetworkMonitorPedrpcServer (pedrpc.server):
         """
 
         self.log("initializing capture for test case #%d" % test_number)
-        
+
         # open the capture device and set the BPF filter.
-        self.pcap = pcapy.open_live(self.device, 65536, 1, 100)
+        # Previously pcap files were truncated, 65536 attempts to put a large
+        # Upper bound on the 'snaplen' (bytes to capture / packet)
+        try:
+            self.pcap = pcapy.open_live(self.device, 65536, 1, 100)
+        # This except block catches the error pcapy throws when 
+        # it cannot listen on device 'self.device'.
+        except pcapy.PcapError as e:
+            print e
         self.pcap.setfilter(self.filter)
 
         # instantiate the capture thread.
@@ -220,19 +228,20 @@ class NetworkMonitorPedrpcServer (pedrpc.server):
 
 ########################################################################################################################
 def run_monitor():
+    usage_message = create_usage()
     rpc_port = 26001
     opts = None
-    device      = None
-    pcap_filter = ""
-    log_path    = "./"
-    log_level   = 1
-    usage_message = create_usage()
     
     # parse command line options.
     try:
         opts, args = getopt.getopt(sys.argv[1:], "d:f:P:l:", ["device=", "filter=", "log_path=", "log_level=", "port="])
     except getopt.GetoptError as err:
         log_error(usage_message)
+
+    device      = None
+    pcap_filter = ""
+    log_path    = "./"
+    log_level   = 1
 
     for opt, arg in opts:
         if opt in ("-d", "--device"):
@@ -247,11 +256,10 @@ def run_monitor():
             rpc_port = int(arg)
 
     if not device:
-        print("No device")
         log_error(usage_message)
 
     try:
-        servlet = NetworkMonitorPedrpcServer("127.0.0.1", rpc_port, device, pcap_filter, log_path, log_level)
+        servlet = NetworkMonitorPedrpcServer("0.0.0.0", rpc_port, device, pcap_filter, log_path, log_level)
         servlet.serve_forever()
     except:
         pass
